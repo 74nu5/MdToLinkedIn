@@ -1,0 +1,192 @@
+<div class="markdown-input-container">
+    <label for="markdown-textarea" class="form-label">MD - Saisissez votre Markdown</label>
+
+    <!-- Barre d'outils -->
+    <div class="toolbar">
+        <button type="button" class="toolbar-btn" @onclick="ApplyH1Format" title="Titre 1">
+            <span class="toolbar-icon">H1</span>
+        </button>
+        <button type="button" class="toolbar-btn" @onclick="ApplyH2Format" title="Titre 2">
+            <span class="toolbar-icon">H2</span>
+        </button>
+        <div class="toolbar-separator"></div>
+        <button type="button" class="toolbar-btn" @onclick="ApplyBoldFormat" title="Gras">
+            <span class="toolbar-icon"><strong>B</strong></span>
+        </button>
+        <button type="button" class="toolbar-btn" @onclick="ApplyItalicFormat" title="Italique">
+            <span class="toolbar-icon"><em>I</em></span>
+        </button>
+        <button type="button" class="toolbar-btn" @onclick="ApplyCodeFormat" title="Code">
+            <span class="toolbar-icon">&lt;/&gt;</span>
+        </button>
+        <div class="toolbar-separator"></div>
+        <button type="button" class="toolbar-btn" @onclick="ApplyListFormat" title="Liste">
+            <span class="toolbar-icon">• List</span>
+        </button>
+    </div>
+
+    <textarea @ref="textAreaRef"
+        id="markdown-textarea"
+        class="form-control markdown-textarea"
+        placeholder="Saisissez votre texte ici..."
+        value="@MarkdownText"
+        @oninput="OnInputChanged"
+        rows="10">
+    </textarea>
+
+    <small class="form-text text-muted mt-2">
+        Supports: # et ## titres, **gras**, *italique*, - listes, `code`
+    </small>
+</div>
+
+@code {
+    [Parameter]
+    public string MarkdownText { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<string> MarkdownTextChanged { get; set; }
+
+    private ElementReference textAreaRef;
+
+    private async Task OnInputChanged(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString() ?? string.Empty;
+        await MarkdownTextChanged.InvokeAsync(value);
+    }
+
+    private Task ApplyH1Format() => ApplyFormat("h1");
+    private Task ApplyH2Format() => ApplyFormat("h2");
+    private Task ApplyBoldFormat() => ApplyFormat("bold");
+    private Task ApplyItalicFormat() => ApplyFormat("italic");
+    private Task ApplyCodeFormat() => ApplyFormat("code");
+    private Task ApplyListFormat() => ApplyFormat("list");
+
+    private async Task ApplyFormat(string format)
+    {
+        var selectionInfo = await GetSelectionInfo();
+        var text = MarkdownText;
+        var start = selectionInfo.Start;
+        var end = selectionInfo.End;
+        var selectedText = text.Substring(start, end - start);
+
+        string newText;
+        int newCursorPos;
+
+        switch (format)
+        {
+            case "h1":
+                newText = ApplyHeader(text, start, end, selectedText, "#");
+                newCursorPos = start;
+                break;
+            case "h2":
+                newText = ApplyHeader(text, start, end, selectedText, "##");
+                newCursorPos = start;
+                break;
+            case "bold":
+                newText = ApplyWrapper(text, start, end, selectedText, "**", "**");
+                newCursorPos = selectedText.Length == 0 ? start + 2 : end + 4;
+                break;
+            case "italic":
+                newText = ApplyWrapper(text, start, end, selectedText, "*", "*");
+                newCursorPos = selectedText.Length == 0 ? start + 1 : end + 2;
+                break;
+            case "code":
+                newText = ApplyWrapper(text, start, end, selectedText, "`", "`");
+                newCursorPos = selectedText.Length == 0 ? start + 1 : end + 2;
+                break;
+            case "list":
+                newText = ApplyList(text, start, end, selectedText);
+                newCursorPos = start;
+                break;
+            default:
+                return;
+        }
+
+        await MarkdownTextChanged.InvokeAsync(newText);
+        await SetSelection(newCursorPos, newCursorPos);
+    }
+
+    private string ApplyHeader(string text, int start, int end, string selectedText, string headerPrefix)
+    {
+        // Find the start of the current line
+        var lineStart = start == 0 ? 0 : text.LastIndexOf('\n', Math.Max(0, start - 1)) + 1;
+
+        // Find the end of the current line
+        var lineEnd = text.IndexOf('\n', end);
+        if (lineEnd == -1) lineEnd = text.Length;
+
+        var currentLine = text.Substring(lineStart, lineEnd - lineStart);
+        var trimmedLine = currentLine.TrimStart('#', ' ');
+        var newLine = $"{headerPrefix} {trimmedLine}";
+
+        return text.Substring(0, lineStart) + newLine + text.Substring(lineEnd);
+    }
+
+    private string ApplyWrapper(string text, int start, int end, string selectedText, string before, string after)
+    {
+        if (selectedText.Length == 0)
+        {
+            return text.Substring(0, start) + before + after + text.Substring(end);
+        }
+        return text.Substring(0, start) + before + selectedText + after + text.Substring(end);
+    }
+
+    private string ApplyList(string text, int start, int end, string selectedText)
+    {
+        // Find the start of the current line
+        var lineStart = start == 0 ? 0 : text.LastIndexOf('\n', Math.Max(0, start - 1)) + 1;
+
+        // Find the end of the current line
+        var lineEnd = text.IndexOf('\n', end);
+        if (lineEnd == -1) lineEnd = text.Length;
+
+        var currentLine = text.Substring(lineStart, lineEnd - lineStart);
+
+        if (currentLine.TrimStart().StartsWith("- "))
+        {
+            var newLine = currentLine.TrimStart().Substring(2);
+            return text.Substring(0, lineStart) + newLine + text.Substring(lineEnd);
+        }
+        else
+        {
+            var newLine = "- " + currentLine.TrimStart();
+            return text.Substring(0, lineStart) + newLine + text.Substring(lineEnd);
+        }
+    }
+
+    private async Task<SelectionInfo> GetSelectionInfo()
+    {
+        try
+        {
+            var module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./Components/MarkdownInput.razor.js");
+            return await module.InvokeAsync<SelectionInfo>("getSelection", textAreaRef);
+        }
+        catch
+        {
+            return new SelectionInfo { Start = 0, End = 0 };
+        }
+    }
+
+    private async Task SetSelection(int start, int end)
+    {
+        try
+        {
+            var module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./Components/MarkdownInput.razor.js");
+            await module.InvokeAsync<object>("setSelection", textAreaRef, start, end);
+        }
+        catch
+        {
+        }
+    }
+
+    private class SelectionInfo
+    {
+        public int Start { get; set; }
+        public int End { get; set; }
+    }
+
+    [Inject]
+    public required IJSRuntime JSRuntime { get; set; }
+}

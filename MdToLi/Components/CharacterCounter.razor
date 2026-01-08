@@ -1,0 +1,23 @@
+<div class="character-counter-container">
+    <div class="counter-box @ColorClass">
+        <span class="counter-text">📊 @FormattedCount</span>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int CharacterCount { get; set; }
+
+    [Parameter]
+    public string VisualCategory { get; set; } = "Green";
+
+    private string FormattedCount => $"{CharacterCount:N0} / 3 000 caractères";
+
+    private string ColorClass => VisualCategory switch
+    {
+        "Green" => "counter-green",
+        "Orange" => "counter-orange",
+        "Red" => "counter-red",
+        _ => "counter-green"
+    };
+}

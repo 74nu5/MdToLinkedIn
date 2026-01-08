@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run)",
+      "Bash(timeout:*)",
+      "Bash(taskkill:*)",
+      "Bash(Stop-Process -Id 37500 -Force)",
+      "Bash(dotnet watch:*)"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+@inject IJSRuntime JS
+
+<div class="copy-button-container">
+    <button class="btn btn-primary btn-lg" @onclick="CopyToClipboard" title="Copier le texte LinkedIn">
+        📋 Copier pour LinkedIn
+    </button>
+    @if (ShowCopyMessage)
+    {
+        <span class="copy-success-message">✅ Copié!</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string TextToCopy { get; set; } = string.Empty;
+
+    private bool ShowCopyMessage = false;
+
+    private async Task CopyToClipboard()
+    {
+        if (string.IsNullOrEmpty(TextToCopy))
+            return;
+
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", TextToCopy);
+            ShowCopyMessage = true;
+            await Task.Delay(2000);
+            ShowCopyMessage = false;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Erreur lors de la copie: {ex.Message}");
+        }
+    }
+}

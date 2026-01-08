@@ -1,0 +1,79 @@
+﻿@page "/"
+@using MdToLi.Models
+@using MdToLi.Services
+
+<PageTitle>Markdown → LinkedIn</PageTitle>
+
+<div class="hero-section">
+    <div class="hero-content">
+        <div class="hero-badge">✨ Nouveau</div>
+        <h1 class="hero-title">Markdown → LinkedIn</h1>
+        <p class="hero-subtitle">Transformez votre Markdown en posts LinkedIn parfaits avec mise en forme Unicode</p>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="editor-section">
+        <!-- Éditeur Markdown -->
+        <div class="editor-card">
+            <MarkdownInput @bind-MarkdownText="markdownText"
+                           @bind-MarkdownText:after="ConvertMarkdown" />
+        </div>
+
+        <!-- Aperçu LinkedIn -->
+        <div class="preview-card">
+            <LinkedInPreview LinkedInText="@conversionResult.LinkedInText" />
+        </div>
+    </div>
+
+    <!-- Section infos -->
+    <div class="info-section">
+        <div class="info-grid">
+            <!-- Compteur de caractères -->
+            <div class="info-card">
+                <CharacterCounter
+                    CharacterCount="@conversionResult.CharacterCount"
+                    VisualCategory="@conversionResult.VisualCategory">
+                </CharacterCounter>
+            </div>
+
+            <!-- Avertissement mobile -->
+            @if (conversionResult.IsTruncatedOnMobile)
+            {
+                <div class="info-card">
+                    <MobileTruncationWarning IsTruncated="@conversionResult.IsTruncatedOnMobile"></MobileTruncationWarning>
+                </div>
+            }
+        </div>
+
+        <!-- Bouton Copier -->
+        <div class="action-section">
+            <CopyButton TextToCopy="@conversionResult.LinkedInText"></CopyButton>
+        </div>
+    </div>
+</div>
+
+<footer class="app-footer">
+    <div class="footer-content">
+        <p>Créé avec Blazor • Aucune donnée n'est stockée</p>
+    </div>
+</footer>
+
+@code {
+    private string markdownText = string.Empty;
+    private ConversionResult conversionResult = new()
+    {
+        LinkedInText = string.Empty,
+        CharacterCount = 0,
+        IsTruncatedOnMobile = false,
+        VisualCategory = "Green"
+    };
+
+    [Inject]
+    public required MarkdownToLinkedInConverter Converter { get; set; }
+
+    private void ConvertMarkdown()
+    {
+        conversionResult = Converter.Convert(markdownText);
+    }
+}

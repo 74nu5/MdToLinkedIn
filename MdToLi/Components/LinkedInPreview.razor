@@ -1,0 +1,18 @@
+<div class="linkedin-preview-container">
+    <label class="form-label">👁️ Aperçu LinkedIn</label>
+    <div class="linkedin-preview-box">
+        @if (string.IsNullOrEmpty(LinkedInText))
+        {
+            <p class="text-muted">Votre aperçu LinkedIn s'affichera ici...</p>
+        }
+        else
+        {
+            <div class="preview-text">@LinkedInText</div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string LinkedInText { get; set; } = string.Empty;
+}

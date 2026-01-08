@@ -1,0 +1,20 @@
+@if (IsTruncated)
+{
+    <div class="mobile-warning-container">
+        <div class="alert alert-warning">
+            <strong>📱 Avertissement: Tronqué sur mobile</strong>
+            <p class="mt-2">
+                Ce post sera tronqué sur mobile. Les premières lignes doivent contenir l''accroche 
+                (environ 240 caractères visibles).
+            </p>
+            <small class="text-muted">
+                LinkedIn affiche ~2-3 lignes avant le bouton "… voir plus"
+            </small>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsTruncated { get; set; }
+}
