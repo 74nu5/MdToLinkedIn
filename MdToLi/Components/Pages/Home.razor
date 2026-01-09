@@ -55,7 +55,7 @@
 
 <footer class="app-footer">
     <div class="footer-content">
-        <p>Créé avec Blazor • Aucune donnée n'est stockée</p>
+        <p>Créé avec Blazor • Données sauvegardées localement dans votre navigateur</p>
     </div>
 </footer>
 
@@ -72,8 +72,25 @@
     [Inject]
     public required MarkdownToLinkedInConverter Converter { get; set; }
 
-    private void ConvertMarkdown()
+    [Inject]
+    public required LocalStorageService LocalStorage { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            markdownText = await LocalStorage.LoadMarkdownAsync();
+            if (!string.IsNullOrEmpty(markdownText))
+            {
+                ConvertMarkdown();
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async void ConvertMarkdown()
     {
         conversionResult = Converter.Convert(markdownText);
+        await LocalStorage.SaveMarkdownAsync(markdownText);
     }
 }
