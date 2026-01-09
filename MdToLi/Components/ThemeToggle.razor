@@ -1,0 +1,58 @@
+@using MdToLi.Services
+@inject ThemeService ThemeService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="theme-toggle-container">
+    <button class="theme-toggle-btn" @onclick="ToggleTheme" title="@(ThemeService.IsDarkMode ? "Mode clair" : "Mode sombre")">
+        @if (ThemeService.IsDarkMode)
+        {
+            <span class="theme-icon">☀️</span>
+        }
+        else
+        {
+            <span class="theme-icon">🌙</span>
+        }
+    </button>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var savedTheme = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "theme-preference");
+            ThemeService.InitializeTheme(savedTheme);
+            await UpdateDocumentTheme();
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        ThemeService.OnThemeChanged += HandleThemeChanged;
+    }
+
+    private async void HandleThemeChanged()
+    {
+        await UpdateDocumentTheme();
+        StateHasChanged();
+    }
+
+    private async Task ToggleTheme()
+    {
+        ThemeService.ToggleTheme();
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "theme-preference", ThemeService.CurrentTheme);
+    }
+
+    private async Task UpdateDocumentTheme()
+    {
+        await JSRuntime.InvokeVoidAsync("eval",
+            $"document.documentElement.setAttribute('data-theme', '{ThemeService.CurrentTheme}')");
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChanged -= HandleThemeChanged;
+    }
+}

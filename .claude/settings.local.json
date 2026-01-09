@@ -7,7 +7,11 @@
       "Bash(timeout:*)",
       "Bash(taskkill:*)",
       "Bash(Stop-Process -Id 37500 -Force)",
-      "Bash(dotnet watch:*)"
+      "Bash(dotnet watch:*)",
+      "Bash(git checkout:*)",
+      "Bash(dotnet run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

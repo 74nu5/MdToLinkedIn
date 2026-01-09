@@ -8,10 +8,44 @@
     --danger-color: #ef4444;
     --bg-gradient-start: #f0f7ff;
     --bg-gradient-end: #ffffff;
+    --card-bg: #ffffff;
     --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --border-radius: 16px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --input-border: #e5e7eb;
+    --input-bg: #ffffff;
+    --preview-bg-start: #f8fafc;
+    --preview-bg-end: #f1f5f9;
+    --preview-border: #e2e8f0;
+    --footer-bg-start: #f9fafb;
+    --footer-bg-end: #f3f4f6;
+    --footer-border: #e5e7eb;
+}
+
+/* === Dark Mode Variables === */
+:root[data-theme="dark"] {
+    --primary-color: #4a9eff;
+    --primary-hover: #3b82f6;
+    --bg-gradient-start: #0f172a;
+    --bg-gradient-end: #1e293b;
+    --card-bg: #1e293b;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --input-border: #334155;
+    --input-bg: #0f172a;
+    --preview-bg-start: #0f172a;
+    --preview-bg-end: #1e293b;
+    --preview-border: #334155;
+    --footer-bg-start: #1e293b;
+    --footer-bg-end: #0f172a;
+    --footer-border: #334155;
 }
 
 /* === Reset & Base === */
@@ -25,8 +59,9 @@ html, body {
     margin: 0;
     padding: 0;
     line-height: 1.6;
-    color: #1f2937;
+    color: var(--text-primary);
     min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* === Hero Section === */
@@ -87,7 +122,7 @@ html, body {
 
 .editor-card,
 .preview-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
     transition: var(--transition);
@@ -113,7 +148,7 @@ html, body {
 }
 
 .info-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
     overflow: hidden;
@@ -134,7 +169,7 @@ html, body {
 .markdown-textarea {
     font-family: "SF Mono", "Consolas", "Monaco", "Courier New", monospace;
     resize: vertical;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--input-border);
     border-radius: 12px;
     width: 100%;
     padding: 1rem;
@@ -142,6 +177,8 @@ html, body {
     line-height: 1.7;
     transition: var(--transition);
     min-height: 300px;
+    background: var(--input-bg);
+    color: var(--text-primary);
 }
 
 .markdown-textarea:focus {
@@ -156,16 +193,17 @@ html, body {
 }
 
 .linkedin-preview-box {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: linear-gradient(135deg, var(--preview-bg-start) 0%, var(--preview-bg-end) 100%);
     padding: 2rem;
     border-radius: 12px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--preview-border);
     font-size: 0.95rem;
     line-height: 1.7;
     white-space: pre-wrap;
     word-wrap: break-word;
     min-height: 300px;
     position: relative;
+    color: var(--text-primary);
 }
 
 .linkedin-preview-box::before {
@@ -312,7 +350,7 @@ html, body {
 .form-label {
     font-weight: 700;
     margin-bottom: 0.75rem;
-    color: #1f2937;
+    color: var(--text-primary);
     display: block;
     font-size: 1.1rem;
 }
@@ -321,10 +359,12 @@ html, body {
     display: block;
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--input-border);
     border-radius: 12px;
     font-family: inherit;
     transition: var(--transition);
+    background: var(--input-bg);
+    color: var(--text-primary);
 }
 
 .form-control:focus {
@@ -336,26 +376,26 @@ html, body {
 .form-text {
     display: block;
     margin-top: 0.5rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 0.875rem;
 }
 
 .text-muted {
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 /* === Footer === */
 .app-footer {
-    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    background: linear-gradient(135deg, var(--footer-bg-start) 0%, var(--footer-bg-end) 100%);
     padding: 2rem;
     text-align: center;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--footer-border);
     margin-top: 4rem;
 }
 
 .footer-content p {
     margin: 0;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 0.95rem;
 }
 
