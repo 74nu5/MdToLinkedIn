@@ -11,7 +11,9 @@
       "Bash(git checkout:*)",
       "Bash(dotnet run:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(Stop-Process -Id 43276 -Force)",
+      "Bash(powershell -Command \"Stop-Process -Id 43276 -Force\")"
     ]
   }
 }
