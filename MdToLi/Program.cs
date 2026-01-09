@@ -9,6 +9,7 @@ builder.Services.AddRazorComponents()
 // Enregistrer les services
 builder.Services.AddScoped<CharacterCounterService>();
 builder.Services.AddScoped<MarkdownToLinkedInConverter>();
+builder.Services.AddScoped<ThemeService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
