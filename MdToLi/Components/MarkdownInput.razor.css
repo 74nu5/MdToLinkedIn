@@ -7,22 +7,22 @@
     align-items: center;
     gap: 0.5rem;
     padding: 1rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 2px solid #e5e7eb;
+    background: linear-gradient(135deg, var(--preview-bg-start) 0%, var(--preview-bg-end) 100%);
+    border: 2px solid var(--input-border);
     border-bottom: none;
     border-radius: 12px 12px 0 0;
     flex-wrap: wrap;
 }
 
 .toolbar-btn {
-    background: white;
-    border: 2px solid #e5e7eb;
+    background: var(--card-bg);
+    border: 2px solid var(--input-border);
     border-radius: 8px;
     padding: 0.5rem 1rem;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -33,9 +33,9 @@
 }
 
 .toolbar-btn:hover {
-    background: linear-gradient(135deg, #0a66c2 0%, #004182 100%);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
     color: white;
-    border-color: #0a66c2;
+    border-color: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(10, 102, 194, 0.2);
 }
@@ -54,7 +54,7 @@
 .toolbar-separator {
     width: 2px;
     height: 2rem;
-    background: linear-gradient(180deg, transparent 0%, #cbd5e1 50%, transparent 100%);
+    background: linear-gradient(180deg, transparent 0%, var(--border-color) 50%, transparent 100%);
     margin: 0 0.25rem;
 }
 
