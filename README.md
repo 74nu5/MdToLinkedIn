@@ -78,7 +78,7 @@ MdToLinkedIn/
 
 ## Tech Stack
 
-- **Framework**: [Blazor Server](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
+- **Framework**: [Blazor WASM](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
 - **Language**: C# / .NET 10
 - **Hosting**: Client-side only (no backend required)
 
