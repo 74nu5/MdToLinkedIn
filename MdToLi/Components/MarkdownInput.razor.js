@@ -6,6 +6,6 @@ export function getSelection(textarea) {
 }
 
 export function setSelection(textarea, start, end) {
-    textarea.focus();
+    textarea.focus({ preventScroll: true });
     textarea.setSelectionRange(start, end);
 }
