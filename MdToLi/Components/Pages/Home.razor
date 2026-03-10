@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using MdToLi.Models
 @using MdToLi.Services
-
 <PageTitle>Markdown → LinkedIn</PageTitle>
 
 <div class="hero-section">
@@ -17,7 +16,8 @@
         <!-- Éditeur Markdown -->
         <div class="editor-card">
             <MarkdownInput @bind-MarkdownText="markdownText"
-                           @bind-MarkdownText:after="ConvertMarkdown" />
+                           @bind-MarkdownText:after="ConvertMarkdown"
+                           SubstitutionRules="@SymbolSubstitution.Rules" />
         </div>
 
         <!-- Aperçu LinkedIn -->
@@ -50,6 +50,11 @@
         <div class="action-section">
             <CopyButton TextToCopy="@conversionResult.LinkedInText"></CopyButton>
         </div>
+
+        <!-- Règles de conversion de symboles -->
+        <div class="info-card">
+            <ConversionRulesPanel />
+        </div>
     </div>
 </div>
 
@@ -75,16 +80,20 @@
     [Inject]
     public required LocalStorageService LocalStorage { get; set; }
 
+    [Inject]
+    public required SymbolSubstitutionService SymbolSubstitution { get; set; }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            await SymbolSubstitution.LoadAsync();
             markdownText = await LocalStorage.LoadMarkdownAsync();
             if (!string.IsNullOrEmpty(markdownText))
             {
                 ConvertMarkdown();
-                StateHasChanged();
             }
+            StateHasChanged();
         }
     }
 

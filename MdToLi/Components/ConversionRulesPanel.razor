@@ -1,0 +1,35 @@
+@using MdToLi.Models
+@using MdToLi.Services
+
+@if (SymbolSubstitution.Rules.Count > 0)
+{
+    <details class="conversion-rules-panel">
+        <summary class="conversion-rules-toggle">
+            🔄 Conversions de symboles disponibles (@SymbolSubstitution.Rules.Count règles)
+        </summary>
+        <table class="conversion-rules-table">
+            <thead>
+                <tr>
+                    <th>Motif</th>
+                    <th>Résultat</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rule in SymbolSubstitution.Rules)
+                {
+                    <tr>
+                        <td><code>@rule.Pattern</code></td>
+                        <td>@rule.Replacement</td>
+                        <td class="rule-description">@rule.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </details>
+}
+
+@code {
+    [Inject]
+    public required SymbolSubstitutionService SymbolSubstitution { get; set; }
+}

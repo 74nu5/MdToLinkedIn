@@ -1,3 +1,5 @@
+@using MdToLi.Models
+
 <div class="markdown-input-container">
     <label for="markdown-textarea" class="form-label">MD - Saisissez votre Markdown</label>
 
@@ -23,6 +25,17 @@
         <button type="button" class="toolbar-btn" @onclick="ApplyListFormat" title="Liste">
             <span class="toolbar-icon">• List</span>
         </button>
+        @if (SubstitutionRules.Count > 0)
+        {
+            <div class="toolbar-separator"></div>
+            <select class="toolbar-select" @bind="_symbolDropdownValue" @bind:after="OnSymbolSelected" title="Insérer un symbole">
+                <option value="">⚡ Symbole…</option>
+                @foreach (var rule in SubstitutionRules)
+                {
+                    <option value="@rule.Pattern">@rule.Pattern → @rule.Replacement</option>
+                }
+            </select>
+        }
     </div>
 
     <textarea @ref="textAreaRef"
@@ -46,7 +59,11 @@
     [Parameter]
     public EventCallback<string> MarkdownTextChanged { get; set; }
 
+    [Parameter]
+    public IReadOnlyList<SymbolSubstitutionRule> SubstitutionRules { get; set; } = [];
+
     private ElementReference textAreaRef;
+    private string _symbolDropdownValue = string.Empty;
 
     private async Task OnInputChanged(ChangeEventArgs e)
     {
@@ -60,6 +77,23 @@
     private Task ApplyItalicFormat() => ApplyFormat("italic");
     private Task ApplyCodeFormat() => ApplyFormat("code");
     private Task ApplyListFormat() => ApplyFormat("list");
+
+    private async Task OnSymbolSelected()
+    {
+        var pattern = _symbolDropdownValue;
+        if (string.IsNullOrEmpty(pattern)) return;
+
+        var selectionInfo = await GetSelectionInfo();
+        var start = selectionInfo.Start;
+        var end = selectionInfo.End;
+
+        var newText = MarkdownText[..start] + pattern + MarkdownText[end..];
+        var newCursorPos = start + pattern.Length;
+
+        _symbolDropdownValue = string.Empty;
+        await MarkdownTextChanged.InvokeAsync(newText);
+        await SetSelection(newCursorPos, newCursorPos);
+    }
 
     private async Task ApplyFormat(string format)
     {
