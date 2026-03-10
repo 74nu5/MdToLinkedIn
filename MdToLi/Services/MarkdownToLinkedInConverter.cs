@@ -10,10 +10,12 @@ using MdToLi.Models;
 public class MarkdownToLinkedInConverter
 {
     private readonly CharacterCounterService _counterService;
+    private readonly SymbolSubstitutionService _substitutionService;
 
-    public MarkdownToLinkedInConverter(CharacterCounterService counterService)
+    public MarkdownToLinkedInConverter(CharacterCounterService counterService, SymbolSubstitutionService substitutionService)
     {
         this._counterService = counterService;
+        this._substitutionService = substitutionService;
     }
 
     /// <summary>
@@ -34,6 +36,7 @@ public class MarkdownToLinkedInConverter
         text = ConvertItalic(text);
         text = ConvertCodeBlocks(text);
         text = ConvertLists(text);
+        text = this._substitutionService.Apply(text);
 
         // Nettoyer les espaces superflus
         text = NormalizeWhitespace(text);

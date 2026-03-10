@@ -1,0 +1,11 @@
+{
+  "substitutions": [
+    { "pattern": "-->", "replacement": "⇒", "description": "Flèche droite double" },
+    { "pattern": "<--", "replacement": "⇐", "description": "Flèche gauche double" },
+    { "pattern": "<-->", "replacement": "⇔", "description": "Double flèche double" },
+    { "pattern": "->", "replacement": "→", "description": "Flèche droite simple" },
+    { "pattern": "<-", "replacement": "←", "description": "Flèche gauche simple" },
+    { "pattern": "<->", "replacement": "↔", "description": "Double flèche simple" },
+    { "pattern": "...", "replacement": "…", "description": "Points de suspension" }
+  ]
+}
