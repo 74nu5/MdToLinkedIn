@@ -1,6 +1,6 @@
 @using MdToLi.Models
 
-<div class="markdown-input-container">
+<div class="markdown-input-container @(IsFocusMode ? "focus-editor-mode" : "")">
     <label for="markdown-textarea" class="form-label">MD - Saisissez votre Markdown</label>
 
     <!-- Barre d'outils -->
@@ -36,6 +36,10 @@
                 }
             </select>
         }
+        <div class="toolbar-separator"></div>
+        <button type="button" class="toolbar-btn focus-toggle-btn" @onclick="OnToggleFocusMode" title="@(IsFocusMode ? "Quitter le mode focus (Échap)" : "Mode focus")">
+            <span class="toolbar-icon">@(IsFocusMode ? "⊟" : "⛶")</span>
+        </button>
     </div>
 
     <textarea @ref="textAreaRef"
@@ -44,6 +48,7 @@
         placeholder="Saisissez votre texte ici..."
         value="@MarkdownText"
         @oninput="OnInputChanged"
+        @onkeydown="HandleKeyDown"
         rows="10">
     </textarea>
 
@@ -62,6 +67,12 @@
     [Parameter]
     public IReadOnlyList<SymbolSubstitutionRule> SubstitutionRules { get; set; } = [];
 
+    [Parameter]
+    public bool IsFocusMode { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggleFocusMode { get; set; }
+
     private ElementReference textAreaRef;
     private string _symbolDropdownValue = string.Empty;
 
@@ -69,6 +80,14 @@
     {
         var value = e.Value?.ToString() ?? string.Empty;
         await MarkdownTextChanged.InvokeAsync(value);
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape" && IsFocusMode)
+        {
+            await OnToggleFocusMode.InvokeAsync();
+        }
     }
 
     private Task ApplyH1Format() => ApplyFormat("h1");

@@ -1,70 +1,110 @@
 ﻿@page "/"
 @using MdToLi.Models
 @using MdToLi.Services
+@using MdToLi.Constants
+@inject IJSRuntime JS
 <PageTitle>Markdown → LinkedIn</PageTitle>
 
-<div class="hero-section">
-    <div class="hero-content">
-        <div class="hero-badge">✨ Nouveau</div>
-        <h1 class="hero-title">Markdown → LinkedIn</h1>
-        <p class="hero-subtitle">Transformez votre Markdown en posts LinkedIn parfaits avec mise en forme Unicode</p>
-    </div>
-</div>
-
-<div class="main-container">
-    <div class="editor-section">
-        <!-- Éditeur Markdown -->
-        <div class="editor-card">
-            <MarkdownInput @bind-MarkdownText="markdownText"
-                           @bind-MarkdownText:after="ConvertMarkdown"
-                           SubstitutionRules="@SymbolSubstitution.Rules" />
-        </div>
-
-        <!-- Aperçu LinkedIn -->
-        <div class="preview-card">
-            <LinkedInPreview LinkedInText="@conversionResult.LinkedInText" />
+@if (!_isFocusMode)
+{
+    <div class="hero-section">
+        <div class="hero-content">
+            <div class="hero-badge">✨ Nouveau</div>
+            <h1 class="hero-title">Markdown → LinkedIn</h1>
+            <p class="hero-subtitle">Transformez votre Markdown en posts LinkedIn parfaits avec mise en forme Unicode</p>
         </div>
     </div>
 
-    <!-- Section infos -->
-    <div class="info-section">
-        <div class="info-grid">
-            <!-- Compteur de caractères -->
-            <div class="info-card">
-                <CharacterCounter
-                    CharacterCount="@conversionResult.CharacterCount"
-                    VisualCategory="@conversionResult.VisualCategory">
-                </CharacterCounter>
+    <div class="main-container">
+        <div class="editor-section">
+            <!-- Éditeur Markdown -->
+            <div class="editor-card">
+                <MarkdownInput @bind-MarkdownText="markdownText"
+                               @bind-MarkdownText:after="ConvertMarkdown"
+                               SubstitutionRules="@SymbolSubstitution.Rules"
+                               IsFocusMode="false"
+                               OnToggleFocusMode="ToggleFocusMode" />
             </div>
 
-            <!-- Avertissement mobile -->
-            @if (conversionResult.IsTruncatedOnMobile)
-            {
+            <!-- Aperçu LinkedIn -->
+            <div class="preview-card">
+                <LinkedInPreview LinkedInText="@conversionResult.LinkedInText" />
+            </div>
+        </div>
+
+        <!-- Section infos -->
+        <div class="info-section">
+            <div class="info-grid">
+                <!-- Compteur de caractères -->
                 <div class="info-card">
-                    <MobileTruncationWarning IsTruncated="@conversionResult.IsTruncatedOnMobile"></MobileTruncationWarning>
+                    <CharacterCounter
+                        CharacterCount="@conversionResult.CharacterCount"
+                        VisualCategory="@conversionResult.VisualCategory">
+                    </CharacterCounter>
                 </div>
-            }
-        </div>
 
-        <!-- Bouton Copier -->
-        <div class="action-section">
-            <CopyButton TextToCopy="@conversionResult.LinkedInText"></CopyButton>
-        </div>
+                <!-- Avertissement mobile -->
+                @if (conversionResult.IsTruncatedOnMobile)
+                {
+                    <div class="info-card">
+                        <MobileTruncationWarning IsTruncated="@conversionResult.IsTruncatedOnMobile"></MobileTruncationWarning>
+                    </div>
+                }
+            </div>
 
-        <!-- Règles de conversion de symboles -->
-        <div class="info-card">
-            <ConversionRulesPanel />
+            <!-- Bouton Copier -->
+            <div class="action-section">
+                <CopyButton TextToCopy="@conversionResult.LinkedInText"></CopyButton>
+            </div>
+
+            <!-- Règles de conversion de symboles -->
+            <div class="info-card">
+                <ConversionRulesPanel />
+            </div>
         </div>
     </div>
-</div>
 
-<footer class="app-footer">
-    <div class="footer-content">
-        <p>Créé avec Blazor • Données sauvegardées localement dans votre navigateur</p>
+    <footer class="app-footer">
+        <div class="footer-content">
+            <p>Créé avec Blazor • Données sauvegardées localement dans votre navigateur</p>
+        </div>
+    </footer>
+}
+else
+{
+    <div class="focus-overlay">
+        <div class="focus-header">
+            <span class="focus-header-title">✍️ Mode Rédaction</span>
+            <span class="focus-char-count focus-counter-@(conversionResult.VisualCategory.ToLower())">
+                @conversionResult.CharacterCount / @LinkedInConstants.MaxLinkedInLength car.
+            </span>
+            <CopyButton TextToCopy="@conversionResult.LinkedInText" />
+            <button class="focus-exit-btn" @onclick="ToggleFocusMode" title="Quitter le mode focus (Échap)">
+                ✕ Quitter
+            </button>
+        </div>
+        <div class="focus-body">
+            <div class="focus-editor-pane">
+                <MarkdownInput @bind-MarkdownText="markdownText"
+                               @bind-MarkdownText:after="ConvertMarkdown"
+                               SubstitutionRules="@SymbolSubstitution.Rules"
+                               IsFocusMode="true"
+                               OnToggleFocusMode="ToggleFocusMode" />
+            </div>
+            <div class="focus-preview-pane">
+                <LinkedInPreview LinkedInText="@conversionResult.LinkedInText" />
+                @if (conversionResult.IsTruncatedOnMobile)
+                {
+                    <MobileTruncationWarning IsTruncated="true" />
+                }
+            </div>
+        </div>
     </div>
-</footer>
+}
 
 @code {
+    private bool _isFocusMode = false;
+
     private string markdownText = string.Empty;
     private ConversionResult conversionResult = new()
     {
@@ -101,5 +141,11 @@
     {
         conversionResult = Converter.Convert(markdownText);
         await LocalStorage.SaveMarkdownAsync(markdownText);
+    }
+
+    private async Task ToggleFocusMode()
+    {
+        _isFocusMode = !_isFocusMode;
+        await JS.InvokeVoidAsync("setBodyClass", "focus-mode-active", _isFocusMode);
     }
 }

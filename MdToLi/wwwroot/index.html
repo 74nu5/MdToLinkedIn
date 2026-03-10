@@ -25,6 +25,12 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+    <script>
+        window.setBodyClass = (className, active) => {
+            if (active) document.body.classList.add(className);
+            else document.body.classList.remove(className);
+        };
+    </script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
